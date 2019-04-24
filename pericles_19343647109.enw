@@ -1,0 +1,34 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%0 Journal Article
+%A Buenrostro, Jason D.
+%A Wu, Beijing
+%A Chang, Howard Y.
+%A Greenleaf, William J.
+
+%T ATAC-seq: A Method for Assaying Chromatin Accessibility Genome-Wide
+%D 2015
+%J Current Protocols in Molecular Biology
+%P 21.29.1-21.29.9
+%V 109
+%N 1
+%@ 1934-3639
+%R 10.1002/0471142727.mb2129s109
+%U https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/0471142727.mb2129s109
+%X Abstract This unit describes Assay for Transposase-Accessible Chromatin with high-throughput sequencing (ATAC-seq), a method for mapping chromatin accessibility genome-wide. This method probes DNA accessibility with hyperactive Tn5 transposase, which inserts sequencing adapters into accessible regions of chromatin. Sequencing reads can then be used to infer regions of increased accessibility, as well as to map regions of transcription-factor binding and nucleosome position. The method is a fast and sensitive alternative to DNase-seq for assaying chromatin accessibility genome-wide, or to MNase-seq for assaying nucleosome positions in accessible regions of the genome. © 2015 by John Wiley & Sons, Inc.
+
+
+
+

@@ -1,0 +1,133 @@
+---
+title: "Nuclei ATAC-seq workflow"
+author: "LLi"
+date: "April 13, 2019"
+output: 
+  html_document: default
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+---
+
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 16px;
+  }
+
+h1.title {
+  font-size: 24px;
+  color: Green;
+}
+
+h1 { /* Header 1 */
+  font-size: 20px;
+  color: DarkBlue;
+}
+
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+</style>
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+```
+
+# Introduction
+Illumina NovaSeq 6000 generates FASTQ files with the naming as below:
+/data/home/username/ATAC_analysis/SM4225_S5_L001_R1_001.fastq.gz
+
++ SM4225 is sample name.
+
++ S5 indicates that this is the fifth sample listed in the sample sheet.
+
++ L001 is lane number.
+
++ R1 is the read. ATAC-seq here uses paired-end run, there is another file with the file name R2.
+
++ 001 is always in the last segment of the FASTQ file name.
+
++ gz indicates that this is a compressed file.
+
+For more information of the FASTQ format, please see: [FASTQ format](https://en.wikipedia.org/wiki/FASTQ_format)
+
+For downstream analysis, there will be two types of scripts (shell - run on linux terminal and R - run on R studio).
+
+# Installation
+Download [MobaXterm](https://mobaxterm.mobatek.net/) as the terminal for solexa2 server from its website.
+
+Programs, including R, [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/) and [Bowtie 2](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml), are already installed in server.
+
+To check if a program is in the server, type in terminal:
+```{bash echo = TRUE, eval = FALSE}
+which fastqc
+```
+To check the program version, type in terminal:
+```{bash echo = TRUE, eval = FALSE}
+fastqc --version
+```
+To read documentation of the program in terminal:
+```{bash echo = TRUE, eval = FALSE}
+fastqc -h
+```
+To open R from terminal, type:
+```{bash echo = TRUE, eval = FALSE}
+R
+```
+
+# Quality control
+FastQC is an application which runs quality checks to produce a report to quickly assess the overall quality of your run, and to spot any sequencing problem. Please watch the Youtube tutorial before use: [Using FastQC to check the quality of high throughput sequence](https://www.youtube.com/watch?v=bz93ReOv87Y)
+
+To run FastQC, type in terminal:
+```{bash echo = TRUE, eval = FALSE}
+fastqc <sample>.R1.fastq.gz
+```
+
+# Download reference genome with pre-built indexes
+Genome indexing is a time- and memory-intense procedure, but it needs to be done only once for a given genome. For M. musculus, UCSC mm10 reference genome, the genome with its pre-built Bowtie 2 indexes are available to download from the *Indexes* panel on the right side of the [Bowtie 2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) webpage. 
+To download, type in terminal:
+```{bash echo = TRUE, eval = FALSE}
+wget ftp://ftp.ccb.jhu.edu/pub/data/bowtie2_indexes/mm10.zip
+```
+To unzip the zip file, type:
+```{bash echo = TRUE, eval = FALSE}
+unzip mm10.zip -d <your_destination_folder>
+```
+When the unzip command completes, the current directory will contain the index files that end with .1.bt2, .2.bt2, .3.bt2, .4.bt2, .rev.1.bt2, and .rev.2.bt2.
+
+# Alignment with Bowtie 2
+Stay in the directory that contains the mm10 index files. To align paired-end reads included with Bowtie 2, type in terminal:
+```{bash echo = TRUE, eval = FALSE}
+nohup bowtie2 -x mm10 -1 <file_path_R1>.fastq.gz -2 <file_path_R2>.fastq.gz -S <your_file_name>.sam &
+```
+To explain the above command line:
+```{bash echo = TRUE, eval = FALSE}
+# Nohup stands for no hang up, which means to execute the command in the background, even after you lot out
+nohup <your_command> &
+```
+```{bash echo = TRUE, eval = FALSE}
+# Argument -x indicates the basename of the indexed reference genome. 
+bowtie2 -x mm10
+```
+```{bash echo = TRUE, eval = FALSE}
+# Sequence filename usually includes _1, or _2, e.g. R1 or R2
+-1 <file_path_R1>.fastq.gz -2 <file_path_R2>.fastq.gz
+```
+```{bash echo = TRUE, eval = FALSE}
+# The alignment results in SAM format are written to <your_file_name>.sam.
+-S <your_file_name>.sam
+```
+
+When use nohup command, please write down PID of this process, for checking if the process is complete later on.
+
+# References
+
+
+
+
