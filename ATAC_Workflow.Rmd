@@ -84,9 +84,19 @@ R
 # Quality control
 FastQC is an application which runs quality checks to produce a report to quickly assess the overall quality of your run, and to spot any sequencing problem. Please watch the Youtube tutorial before use: [Using FastQC to check the quality of high throughput sequence](https://www.youtube.com/watch?v=bz93ReOv87Y)
 
-To run FastQC, type in terminal:
+To run FastQC and then MultiQC, type in terminal:
 ```{bash echo = TRUE, eval = FALSE}
-fastqc <sample>.R1.fastq.gz
+# First create a new folder called fastqc_folder
+mkdir fastqc_folder
+
+# Run FastQC on all the files ended with fastq.gz and leave the output data in fastqc_folder
+nohup fastqc -o fastqc_folder *.fastq.gz &
+
+# Go to the directory fastqc_folder
+cd fastqc_folder
+
+# Run MultiQC to assemble all fastqc results
+multiqc .
 ```
 
 # Download reference genome with pre-built indexes
