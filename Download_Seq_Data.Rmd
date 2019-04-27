@@ -1,0 +1,77 @@
+---
+title: "Multiple ways to download public sequencing data"
+author: "LL"
+date: "April 27, 2019"
+output: 
+  html_document: 
+    theme: readable
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+---
+
+# Download NCBI Sequence Read Archive (SRA) file with the SRA Toolkit
+
+The following command lines are required for this process:
+```{bash echo = TRUE, eval = FALSE}
+# Non-interactive download of files from the internet, supporting FTP, HTTP etc.
+wget [URL]
+
+# Download command from SRA Toolkit
+prefetch <SRA accession>
+
+# Converts .sra to fastq or fasta format
+fastq-dump <SRA accession>
+
+# "fastq-dump" is time-consuming. Even if the current shell is terminated, "nohup &" put your process to run in the background
+nohup <YOUR COMMAND HERE> &
+```
+
+To check out features of the command line, type:
+```{bash echo = TRUE, eval = FALSE}
+nohup --help
+```
+
+To check out the related NCBI documentation of the SRA Toolkit, see:
+[Downloading SRA data using command line utilities](https://www.ncbi.nlm.nih.gov/books/NBK158899/#SRA_download.downloading_sra_data_using), and [Using the SRA Toolkit to convert .sra files into other formats](https://www.ncbi.nlm.nih.gov/books/NBK158900/)
+
+## Download from NCBI website
+Find out the SRA run accession number (SRR) of the sequencing data on https://www.ncbi.nlm.nih.gov/sra
+
+```{bash echo = TRUE, eval = FALSE}
+wget ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR300/SRR3000759/SRR3000759.sra
+
+```
+
+Another alternative option is:
+```{bash echo = TRUE, eval = FALSE}
+prefetch SRR3000759
+
+```
+
+## Download from ENA
+Find out the SRA run accession number (SRR) of the sequencing data on https://www.ebi.ac.uk/ena
+
+```{bash echo = TRUE, eval = FALSE}
+wget ftp://ftp.sra.ebi.ac.uk/vol1/srr/SRR300/000/SRR3000760
+
+```
+
+# Convert .sra file to fastq or fasta file
+
+## For a single .sra file
+```{bash echo = TRUE, eval = FALSE}
+nohup fastq-dump SRR3000759.sra &
+```
+
+## For multiple .sra files
+```{bash echo = TRUE, eval = FALSE}
+nohup for i in SRR*; do fastq-dump -A $i; done &
+```
+
+# Download fastq file directly from ENA
+Copy the "FASTQ files (FTP)" link of the sequencing data on https://www.ebi.ac.uk/ena
+
+```{bash echo = TRUE, eval = FALSE}
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR300/001/SRR3000761/SRR3000761.fastq.gz
+```

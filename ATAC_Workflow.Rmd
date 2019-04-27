@@ -1,6 +1,6 @@
 ---
 title: "Nuclei ATAC-seq workflow"
-author: "LLi"
+author: "LL"
 date: "April 13, 2019"
 output: 
   html_document: default
@@ -64,7 +64,7 @@ Download [MobaXterm](https://mobaxterm.mobatek.net/) as the terminal for solexa2
 
 Programs, including R, [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/) and [Bowtie 2](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml), are already installed in server.
 
-To check if a program is in the server, type in terminal:
+To check if a program is in the server, type in terminal (with the application FastQC as an example):
 ```{bash echo = TRUE, eval = FALSE}
 which fastqc
 ```
@@ -102,13 +102,17 @@ unzip mm10.zip -d <your_destination_folder>
 When the unzip command completes, the current directory will contain the index files that end with .1.bt2, .2.bt2, .3.bt2, .4.bt2, .rev.1.bt2, and .rev.2.bt2.
 
 # Alignment with Bowtie 2
+The sequence alignments is stored in the SAM (Sequence Alignment/Map) format.
+
+
+
 Stay in the directory that contains the mm10 index files. To align paired-end reads included with Bowtie 2, type in terminal:
 ```{bash echo = TRUE, eval = FALSE}
 nohup bowtie2 -x mm10 -1 <file_path_R1>.fastq.gz -2 <file_path_R2>.fastq.gz -S <your_file_name>.sam &
 ```
 To explain the above command line:
 ```{bash echo = TRUE, eval = FALSE}
-# Nohup stands for no hang up, which means to execute the command in the background, even after you lot out
+# Nohup stands for no hang up, which means to execute the command in the background, even after you log out
 nohup <your_command> &
 ```
 ```{bash echo = TRUE, eval = FALSE}
@@ -124,7 +128,15 @@ bowtie2 -x mm10
 -S <your_file_name>.sam
 ```
 
-When use nohup command, please write down PID of this process, for checking if the process is complete later on.
+When use nohup command, please write down the PID of this process, for checking if the process is complete later on.
+
+Once the process is finished, to have a glimpse of the SAM file, type:
+```{bash echo = TRUE, eval = FALSE}
+head <your_file_name>.sam
+```
+Please watch this Coursera video to understand the SAM format: [Sequences and Genomic Features 4.1: Alignment I](https://www.coursera.org/lecture/genomic-tools/sequences-and-genomic-features-4-1-alignment-i-m49pF)
+
+samtools is time-consuming. nohup is needed here:
 
 # References
 
