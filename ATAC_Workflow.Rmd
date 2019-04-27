@@ -82,7 +82,7 @@ R
 ```
 
 # Quality control
-FastQC is an application which runs quality checks to produce a report to quickly assess the overall quality of your run, and to spot any sequencing problem. Please watch the Youtube tutorial before use: [Using FastQC to check the quality of high throughput sequence](https://www.youtube.com/watch?v=bz93ReOv87Y)
+FastQC is an application which runs quality checks to produce a report to quickly assess the overall quality of your run, and to spot any sequencing problem. MultiQC assembles FastQC results into a single report. Please watch the Youtube tutorial before use: [Using FastQC to check the quality of high throughput sequence](https://www.youtube.com/watch?v=bz93ReOv87Y)
 
 To run FastQC and then MultiQC, type in terminal:
 ```{bash echo = TRUE, eval = FALSE}
@@ -95,7 +95,7 @@ nohup fastqc -o fastqc_folder *.fastq.gz &
 # Go to the directory fastqc_folder
 cd fastqc_folder
 
-# Run MultiQC to assemble all fastqc results
+# Run MultiQC to assemble all fastqc results in the current directory
 multiqc .
 ```
 
