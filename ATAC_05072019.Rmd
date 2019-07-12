@@ -1,14 +1,26 @@
 ---
-title: "Untitled"
-author: "LLi"
+title: "Report of ATAC-seq (sequencing date: 05/07/2019)"
 date: "7/12/2019"
-output: html_document
+output: 
+  html_document:
+    fig_width: 2
+    fig_height: 1
+    fig_caption: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+library(tidyverse)
 ```
+# Results
+## Distribution of fragment length in ATAC-seq library
+We expect fragment distribution with clear nucleosome phasing. Peak at ~ 150 bp results from sequence reads that span one nucleosome, and larger peaks represent progressively multiple conpact chromatins.
 
+![ATAC-seq library fragment length](C:/Users/lingzili/Documents/ATAC_Nuclei/graph/picard_insert_size.png)
+
+## Venn diagram of alpha-cell-selective and beta-cell-selective peaks
+
+# Methods
 ## fastqc raw reads
 
 ```{bash eval=FALSE}
@@ -105,7 +117,7 @@ echo $''
 done
 ```
 
-# Create Bedgraph
+## Create Bedgraph
 ```{bash eval=FALSE}
 # MACS2 create bedGraph for visualization (paired-end, equal to HOMER create BedGraph)
 for j in *.bam
@@ -121,3 +133,32 @@ do echo "Start compression on $j"
 gzip $j
 done
 ```
+
+## Reads clean-up
+```{bash eval=FALSE}
+# Remove mitochondrial DNA, low-quality reads (MAPQ < 10), duplicates and Encode blacklist regions
+
+done
+```
+
+## Peak calling and annotation
+```{bash eval=FALSE}
+# All mapped reads are offset by +4 bp for the +strand and -5 bp for the -strand
+# Peak calling
+macs2 -q 0.05 -nomodel -shift 37 -extsize 73
+
+# Differential peaks between different cell types
+macs2 bdgdiff
+
+# Join together ndividual peaks separated by <100 bp 
+
+# Peak annotation by HOMER
+
+# Motif analysis on peak regions by HOMER
+findMotifsGenome.pl 
+
+done
+```
+
+
+
