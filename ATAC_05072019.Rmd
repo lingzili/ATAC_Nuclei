@@ -1,0 +1,123 @@
+---
+title: "Untitled"
+author: "LLi"
+date: "7/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## fastqc raw reads
+
+```{bash eval=FALSE}
+# Create a new directory fastqc
+mkdir output_fastqc
+
+# Create a new screen
+screen -S fastqc
+
+# Move to the directory where raw reads are stored
+cd /data/home/lingzili/VDS2/NGS_Runs/190705_A00316_0085_AHCJFTDRXX/Data/Intensities/BaseCalls/Demultiplex_ATAC/KO_SM/
+
+# fastqc raw reads
+fastqc -t 16 -o /data/home/lingzili/ATAC_analysis/05072019/output_fastqc/ *.fastq.gz
+
+# Move to the directory where fastqc output is
+cd /data/home/lingzili/ATAC_analysis/05072019/output_fastqc/
+
+# Run MultiQC to assemble all fastqc results in the current directory
+multiqc .
+
+```
+
+Examine the fastqc results
+
+## Reads trimming
+
+```{bash eval=FALSE}
+# Categorize files based on reads
+ls *gz | cut -d"_" -f 1 | sort -u | while read id
+do 
+Read1=$(ls ${id}_*R1_001.fastq.gz)
+echo "Read1 is defined as $Read1"
+Read2=$(ls ${id}_*R2_001.fastq.gz)
+echo "Read2 is defined as $Read2"
+done
+
+# Trim Nextera adapter
+ls *gz | cut -d"_" -f 1 | sort -u | while read id
+do
+Read1=$(ls ${id}_*R1_001.fastq.gz)
+Read2=$(ls ${id}_*R2_001.fastq.gz)
+echo "Read1 is defined as $Read1 and Read2 is defined as $Read2"
+echo "Start trimming on sample $id"
+trim_galore --nextera --paired --fastqc --output_dir /data/home/lingzili/ATAC_analysis/05072019/ $Read1 $Read2
+done
+
+# Do multiqc on trimmed fastqc files
+```
+
+## Alignment with Bowtie2
+
+```{bash eval=FALSE}
+# Bowtie2 alignment
+ls *gz | cut -d"_" -f 1 | sort -u | while read id
+do 
+Read1=$(ls ${id}_*R1_*.fq.gz)
+Read2=$(ls ${id}_*R2_*.fq.gz)
+echo "Read1 is defined as $Read1 and Read2 is defined as $Read2"
+echo "Start alignment with sample $id"
+bowtie2 -p 16 --very-sensitive -k 10 -x /data/home/lingzili/mm10_genome/Mus_musculus/UCSC/mm10/Sequence/Bowtie2Index/genome -1 $Read1 -2 $Read2 -S ${id}_trim.sam
+done
+
+# Convert from sam to bam, and sort
+for id in *.sam
+do echo "Begin processing $id"
+baseFilename=`basename $id .sam`
+samtools view -@ 16 -bS $id | samtools sort -@ 16 -o ${baseFilename}.bam
+echo "${id} is converted to ${baseFilename}.bam"
+done
+
+```
+
+## Alignment QC
+
+```{bash eval=FALSE}
+# Get stat from bam file
+for i in *.bam
+do baseFilename=`basename $i .bam`
+samtools flagstat -@ 16 $i > ${baseFilename}.stat.txt
+done 
+
+# Do multiqc on flagstat reports
+multiqc .
+
+# Size distribution of paired-end library
+for j in *.bam
+do echo "Analyze size distribution in $j"
+echo $''
+baseFilename=`basename $j .bam`
+java -jar /data/home/lingzili/genomeTools/picard.jar CollectInsertSizeMetrics I=$j O=${baseFilename}.size.out H=${baseFilename}_size_histogram.pdf HISTOGRAM_WIDTH=800 INCLUDE_DUPLICATES=true M=0.1
+echo "Size distribution analysis on ${baseFilename} is complete"
+echo $''
+done
+```
+
+# Create Bedgraph
+```{bash eval=FALSE}
+# MACS2 create bedGraph for visualization (paired-end, equal to HOMER create BedGraph)
+for j in *.bam
+do echo "Create bedGraph on $j"
+baseFilename=`basename $j .bam`
+macs2 pileup -i $j -o ${baseFilename}.bdg -f BAMPE
+echo "${baseFilename}.bdg is done"
+done
+
+# Compress bdg file for download
+for j in *.bdg
+do echo "Start compression on $j"
+gzip $j
+done
+```
