@@ -2,19 +2,7 @@ library(tidyverse)
 library(readxl)
 
 # Load data set
-ATAC_QC <- read_excel("ATAC_QC.xlsx", col_types = c(
-  "text", "text", "text", "text", "text", "text",
-  "text", "numeric", "numeric", "numeric",
-  "numeric", "numeric", "numeric", "numeric", "numeric"
-))
-
-View(ATAC_QC)
-
-# Subset data
-ATAC_QC <- subset(ATAC_QC, select = -c(1, 2, 7))
-
-ATAC_QC <- ATAC_QC[c(3:6), ]
-
+ATAC_QC <- read_excel("ATAC_QC.xlsx", col_types = c("text", "text", "text", "text", "numeric", "text", "numeric"))
 View(ATAC_QC)
 
 # Set standard theme for barplot
@@ -33,8 +21,25 @@ standard_theme_barplot <- theme(
   panel.background = element_blank(),
   panel.border = element_rect(colour = "black", fill = NA, size = 2),
   plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
-  plot.title = element_text(color = "black", size = 20, face = "bold")
+  plot.title = element_text(color = "black", size = 16, face = "bold")
 )
+
+# Barplot for alignment rates
+align_p1 <- ATAC_QC %>%
+  ggplot(aes(x = ID, y = Align_Rate_Percent, fill = Tn5))
+
+align_p2 <- align_p1 +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_text(aes(label = Align_Rate_Percent), vjust = 0, color = "black", position = position_dodge(0.9), size = 5) +
+  ylim(0, 100) +
+  labs(title = "Alignment rate to mouse genome mm10", x = NULL, y = "% Alignment") +
+  standard_theme_barplot +
+  scale_fill_brewer(palette = "Dark2") +
+  coord_flip()
+
+align_p2
+
+ggsave(here::here("Align_Rate_040919.png"), align_p2) # Saving 8.58 x 5.7 in image
 
 # Barplot for read counts
 read_p1 <- ATAC_QC %>%
@@ -50,24 +55,6 @@ read_p2 <- read_p1 +
 read_p2
 
 ggsave(here::here("Read_Count_230619.png"), read_p2) # Saving 8.58 x 5.7 in image
-
-# Barplot for alignment rates
-align_p1 <- ATAC_QC %>%
-  ggplot(aes(x = ID, y = Align_Rate_Percent, fill = ID))
-
-align_p2 <- align_p1 +
-  geom_bar(stat = "identity", position = position_dodge()) +
-  geom_text(aes(label = Align_Rate_Percent), vjust = 0, color = "black", position = position_dodge(0.9), size = 5) +
-  ylim(0, 100) +
-  labs(title = "Alignment rate to mouse genome mm10", x = NULL, y = "% Alignment") +
-  guides(fill = "none") + # Remove legends
-  standard_theme_barplot +
-  scale_x_discrete(labels = c("SM4227" = "Ins1creTRAP Tn5 1", "SM4492" = "TRAP Tn5 1", "SM4493" = "TRAP Tn5 0.5", "SM4494" = "TRAP Tn5 0.25")) +
-  scale_fill_manual(values = c("#56B4E9", "#56B4E9", "#56B4E9", "#56B4E9"))
-
-align_p2
-
-ggsave(here::here("Align_Rate_230619.png"), align_p2) # Saving 8.58 x 5.7 in image
 
 # Barplot for alignment fractions
 align_p1 <- ATAC_QC %>%
